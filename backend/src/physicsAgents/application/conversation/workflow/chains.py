@@ -1,5 +1,5 @@
 from langchain_groq import ChatGroq
-from backend.settings import settings
+from physicsAgents.settings import settings
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 

@@ -1,5 +1,6 @@
 from langgraph.graph import END, START, StateGraph
 from physicsAgents.application.conversation.workflow.nodes import conversation_node
+from physicsAgents.application.conversation.workflow.state import PhysicistState
 
 
 def initiate_workflow():
@@ -7,7 +8,7 @@ def initiate_workflow():
     Initiates the workflow for the physics agents conversation.
     This function sets up the necessary components and starts the workflow.
     """
-    graph_builder = StateGraph()
+    graph_builder = StateGraph(PhysicistState)
 
     graph_builder.add_node("conversation", conversation_node)
 
