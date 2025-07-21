@@ -76,7 +76,7 @@ async def websocket_endpoint(websocket: WebSocket):
 async def chat(chat_msg: ChatMsg):
     try:
         res = await get_chat_response(messages=chat_msg.msg)
-        return {"response", res}
+        return {"response": res}
     except Exception as e:
         # 500 is internal error
         raise HTTPException(status_code=500, detail=str(e))

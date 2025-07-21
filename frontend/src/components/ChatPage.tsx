@@ -1,6 +1,9 @@
 import { FaArrowLeft } from 'react-icons/fa';
 import { IoMdSend } from 'react-icons/io';
 import { type Chat as SingleChat } from './ChatsList';
+import { useEffect, useState } from 'react';
+import { sendChat } from '@/services/chatService';
+
 export type ChatMessage = {
   me: boolean;
   msg: string;
@@ -20,6 +23,7 @@ interface IChatPage {
   setChats: React.Dispatch<React.SetStateAction<Chat[]>>;
 }
 
+// TODO: UI Bug. doesnt scroll down auto. 
 export const ChatPage = ({
   selectedChatId,
   setSelectedChat,
@@ -27,27 +31,25 @@ export const ChatPage = ({
   chatInfo,
   setChats,
 }: IChatPage) => {
-  const currentChatMsgs = chatMsgs.find(({ id }) => id === selectedChatId);
+  const currentChatMsgs = chatMsgs.find(
+    ({ userId }) => userId === selectedChatId,
+  );
+  const [newMsg, setNewMsg] = useState('');
+  const [loading, setLoading] = useState(false);
   const className =
     'w-max max-w-[80%] py-1 px-1.5 rounded-lg shadow-md text-sm text-black flex  items-end';
 
-  // TODO: fix the types here
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const msg = e.target.msg.value;
-    if (e.target instanceof HTMLFormElement) {
-      e.target.reset();
-    }
-
     setChats(
       chatMsgs.map((chat) => {
-        if (chat.id === selectedChatId) {
+        if (chat.userId === selectedChatId) {
           return {
             ...chat,
             messages: [
               ...chat.messages,
               {
-                msg,
+                msg: newMsg,
                 me: true,
               },
             ],
@@ -56,7 +58,40 @@ export const ChatPage = ({
         return chat;
       }),
     );
+    setLoading(true)
   };
+
+  useEffect(() => {
+    const fn = async () => {
+      if (loading) {
+        console.log("HE")
+        // Display loading somewhere?
+        const dataMsg = newMsg 
+        setNewMsg('');
+        const data = (await sendChat({ msg: dataMsg })).data.response;
+        console.log(data)
+        setChats(
+          chatMsgs.map((chat) => {
+            if (chat.userId === selectedChatId) {
+              return {
+                ...chat,
+                messages: [
+                  ...chat.messages,
+                  {
+                    msg: data,
+                    me: false,
+                  },
+                ],
+              };
+            }
+            return chat;
+          }),
+        );
+        setLoading(false);
+      }
+    };
+    fn();
+  }, [loading]);
 
   return (
     <main className="min-h-screen bg-[url(https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png)] bg-cover bg-fixed">
@@ -74,8 +109,8 @@ export const ChatPage = ({
       </header>
 
       <section className="relative flex flex-col gap-3 p-2 pb-44">
-        {chatMsgs
-          ? chatMsgs[0].messages.map(({ msg, me }, i) => (
+        {currentChatMsgs
+          ? currentChatMsgs.messages.map(({ msg, me }, i) => (
               <div
                 key={i}
                 className={`${
@@ -106,6 +141,8 @@ export const ChatPage = ({
             <GrEmoji className="text-2xl" />
           </p> */}
           <input
+            value={newMsg}
+            onChange={(e) => setNewMsg(e.target.value)}
             name="msg"
             className="w-full flex-grow text-black outline-none"
             type="text"
