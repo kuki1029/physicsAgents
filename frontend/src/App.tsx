@@ -5,7 +5,7 @@ import { type Chat as ChatMsgs, ChatPage } from './components/ChatPage';
 
 const defaultChatsList = [
   {
-    name: 'Bob',
+    name: 'Stephen Hawking',
     avatar: undefined,
     id: '123',
   },

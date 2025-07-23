@@ -2,7 +2,7 @@ import { FaArrowLeft } from 'react-icons/fa';
 import { IoMdSend } from 'react-icons/io';
 import { type Chat as SingleChat } from './ChatsList';
 import { useEffect, useState } from 'react';
-import { sendChat } from '@/services/chatService';
+import { useWebsocket } from '@/hooks/useWebsocket';
 
 export type ChatMessage = {
   me: boolean;
@@ -23,7 +23,7 @@ interface IChatPage {
   setChats: React.Dispatch<React.SetStateAction<Chat[]>>;
 }
 
-// TODO: UI Bug. doesnt scroll down auto. 
+// TODO: UI Bug. doesnt scroll down auto.
 export const ChatPage = ({
   selectedChatId,
   setSelectedChat,
@@ -34,10 +34,48 @@ export const ChatPage = ({
   const currentChatMsgs = chatMsgs.find(
     ({ userId }) => userId === selectedChatId,
   );
+  const [newRes, setNewRes] = useState('');
   const [newMsg, setNewMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const className =
     'w-max max-w-[80%] py-1 px-1.5 rounded-lg shadow-md text-sm text-black flex  items-end';
+
+  // TODO Move up url to somewhere else
+  const { send, connected } = useWebsocket<ChatMessage>(
+    'ws://localhost:8000/ws/chat',
+    {
+      onMessage: (data) => {
+        //TODO: Fix this type
+        if (data.chunk) {
+          const msg = data.chunk as string;
+          setNewRes((prev) => prev + msg);
+        }
+        if (data.response) {
+          setChats((prevChats) =>
+            prevChats.map((chat) => {
+              if (chat.userId === selectedChatId) {
+                return {
+                  ...chat,
+                  messages: [
+                    ...chat.messages,
+                    {
+                      msg: data.response,
+                      me: false,
+                    },
+                  ],
+                };
+              }
+              return chat;
+            }),
+          );
+          setNewRes('');
+        }
+      },
+      onOpen: () => console.log('WebSocket connected'),
+      onClose: () => console.log('WebSocket disconnected'),
+      onError: () => console.error('WebSocket error'),
+    },
+  );
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -58,40 +96,41 @@ export const ChatPage = ({
         return chat;
       }),
     );
-    setLoading(true)
+    setLoading(true);
   };
 
   useEffect(() => {
     const fn = async () => {
       if (loading) {
-        console.log("HE")
         // Display loading somewhere?
-        const dataMsg = newMsg 
+        const dataMsg = newMsg;
         setNewMsg('');
-        const data = (await sendChat({ msg: dataMsg })).data.response;
-        console.log(data)
-        setChats(
-          chatMsgs.map((chat) => {
-            if (chat.userId === selectedChatId) {
-              return {
-                ...chat,
-                messages: [
-                  ...chat.messages,
-                  {
-                    msg: data,
-                    me: false,
-                  },
-                ],
-              };
-            }
-            return chat;
-          }),
-        );
+        // const data = (await sendChat({ msg: dataMsg })).data.response;
+        send({ msg: dataMsg });
+        // setChats(
+        //   chatMsgs.map((chat) => {
+        //     if (chat.userId === selectedChatId) {
+        //       return {
+        //         ...chat,
+        //         messages: [
+        //           ...chat.messages,
+        //           {
+        //             msg: data,
+        //             me: false,
+        //           },
+        //         ],
+        //       };
+        //     }
+        //     return chat;
+        //   }),
+        // );
         setLoading(false);
       }
     };
     fn();
   }, [loading]);
+
+  if (!connected) return <p>Connecting...</p>;
 
   return (
     <main className="min-h-screen bg-[url(https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png)] bg-cover bg-fixed">
@@ -130,6 +169,15 @@ export const ChatPage = ({
               </div>
             ))
           : null}
+        {newRes.length ? (
+          <div
+            className={`${'bg-white'} ${className} ${
+              newRes.length < 25 ? 'flex-row gap-2' : 'flex-col'
+            }`}
+          >
+            <p className="px-1.5 py-0.5">{newRes}</p>
+          </div>
+        ) : null}
       </section>
 
       <form
