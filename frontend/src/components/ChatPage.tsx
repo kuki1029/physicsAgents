@@ -97,30 +97,12 @@ export const ChatPage = ({
   };
 
   useEffect(() => {
+    if (loading) setNewRes('...')
     const fn = async () => {
       if (loading && connected) {
-        // Display loading somewhere?
         const dataMsg = newMsg;
         setNewMsg('');
-        // const data = (await sendChat({ msg: dataMsg })).data.response;
-        send({ msg: dataMsg });
-        // setChats(
-        //   chatMsgs.map((chat) => {
-        //     if (chat.userId === selectedChatId) {
-        //       return {
-        //         ...chat,
-        //         messages: [
-        //           ...chat.messages,
-        //           {
-        //             msg: data,
-        //             me: false,
-        //           },
-        //         ],
-        //       };
-        //     }
-        //     return chat;
-        //   }),
-        // );
+        send({ msg: dataMsg, id: chatInfo.id });
         setLoading(false);
       }
     };
@@ -179,7 +161,7 @@ export const ChatPage = ({
 
       <form
         onSubmit={onSubmit}
-        className="group fixed bottom-0 left-0 flex w-full items-center gap-2 bg-red-500/0 bg-[url(https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png)] p-2 pt-0.5"
+        className="fixed bottom-0 left-0 flex w-full items-center gap-2 bg-red-500/0 bg-[url(https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png)] p-2 pt-0.5"
       >
         <div className="flex flex-grow items-center gap-3 rounded-full border bg-white p-2 text-black/50">
           {/* <p>
@@ -192,12 +174,13 @@ export const ChatPage = ({
             className="w-full flex-grow text-black outline-none"
             type="text"
             required
+            disabled={!!newRes.length}
             placeholder="Type a message"
           />
         </div>
 
         <button type="submit" className="rounded-full bg-primary p-3">
-          <IoMdSend className="text-xl text-white group-invalid:hidden" />
+          <IoMdSend className="text-xl text-white" />
         </button>
       </form>
     </main>
