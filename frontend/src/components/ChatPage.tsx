@@ -12,7 +12,7 @@ export type ChatMessage = {
 export type Chat = {
   id: string;
   userId: string;
-  messages: ChatMessage[];
+  messages: ChatMessage[] | [];
 };
 
 interface IChatPage {
@@ -70,10 +70,7 @@ export const ChatPage = ({
           );
           setNewRes('');
         }
-      },
-      onOpen: () => console.log('WebSocket connected'),
-      onClose: () => console.log('WebSocket disconnected'),
-      onError: () => console.error('WebSocket error'),
+      }
     },
   );
 
@@ -101,7 +98,7 @@ export const ChatPage = ({
 
   useEffect(() => {
     const fn = async () => {
-      if (loading) {
+      if (loading && connected) {
         // Display loading somewhere?
         const dataMsg = newMsg;
         setNewMsg('');

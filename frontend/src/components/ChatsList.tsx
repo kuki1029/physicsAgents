@@ -1,17 +1,16 @@
 export type Chat = {
-    id: string;
-    name: string;
-    avatar: undefined;
-}
+  id: string;
+  name: string;
+  desc: string
+  avatar: string;
+};
 
 interface IChatsList {
-    chats: Chat[],
-    setSelectedChat: React.Dispatch<React.SetStateAction<string>>
+  chats: Chat[];
+  setSelectedChat: React.Dispatch<React.SetStateAction<string>>;
 }
 
-
 export const ChatsList = ({ chats, setSelectedChat }: IChatsList) => {
-
   return (
     <>
       <section className="">
@@ -22,13 +21,16 @@ export const ChatsList = ({ chats, setSelectedChat }: IChatsList) => {
             onClick={() => setSelectedChat(chat.id)}
           >
             <img
-              className="rounded-full bg-gray-800 w-12 h-12 object-cover"
+              className="h-12 w-12 rounded-full bg-gray-800 object-cover"
               src={chat.avatar}
             />
             <div>
-              <h4 className="text-gray-800 font-medium text-base flex justify-between">
+              <h4 className="flex justify-between text-base font-medium text-gray-800">
                 <span>{chat.name}</span>
               </h4>
+              <p className="flex font-light text-xs text-gray-400">
+                <span>{chat.desc}</span>
+              </p>
             </div>
           </div>
         ))}
