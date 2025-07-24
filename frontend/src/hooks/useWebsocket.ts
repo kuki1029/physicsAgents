@@ -7,9 +7,9 @@ interface IWebsocketOptions<T> {
   onError?: (event: Event) => void;
   reconnect?: boolean;
   maxReconnectAttempts?: number;
-  reconnectIntervalMs?: number;   // initial reconnect delay
-  reconnectDecay?: number;        // exponential backoff factor
-  manualStart?: boolean;          // if true, connect() must be called manually
+  reconnectIntervalMs?: number; // initial reconnect delay
+  reconnectDecay?: number; // exponential backoff factor
+  manualStart?: boolean; // if true, connect() must be called manually
 }
 
 export function useWebsocket<T = any>(
@@ -27,7 +27,7 @@ export function useWebsocket<T = any>(
     reconnectDecay = 1.5,
     manualStart = false,
   } = options;
-
+console.log(url)
   const wsRef = useRef<WebSocket | null>(null);
   // Track number of reconnect attempts
   const reconnectAttemptsRef = useRef(0);
@@ -76,6 +76,7 @@ export function useWebsocket<T = any>(
 
       ws.onopen = () => {
         reconnectAttemptsRef.current = 0;
+        console.log('A');
         setConnected(true);
         onOpenRef.current?.();
       };
@@ -105,7 +106,9 @@ export function useWebsocket<T = any>(
           !manuallyClosedRef.current &&
           reconnectAttemptsRef.current < maxReconnectAttempts
         ) {
-          const timeout = reconnectIntervalMs * Math.pow(reconnectDecay, reconnectAttemptsRef.current);
+          const timeout =
+            reconnectIntervalMs *
+            Math.pow(reconnectDecay, reconnectAttemptsRef.current);
           reconnectTimeoutRef.current = setTimeout(() => {
             reconnectAttemptsRef.current += 1;
             connect();
@@ -114,16 +117,22 @@ export function useWebsocket<T = any>(
       };
     } catch (error) {
       // Very rare, likely browser rejects URL
-      console.error("WebSocket connection failed:", error);
+      console.error('WebSocket connection failed:', error);
     }
-  }, [url, reconnect, maxReconnectAttempts, reconnectIntervalMs, reconnectDecay]);
+  }, [
+    url,
+    reconnect,
+    maxReconnectAttempts,
+    reconnectIntervalMs,
+    reconnectDecay,
+  ]);
 
   // Disconnect function to close WS and disable reconnect
   const disconnect = useCallback(() => {
     manuallyClosedRef.current = true;
     clearReconnectTimeout();
     if (wsRef.current) {
-      wsRef.current.close(1000, "Manual disconnect");
+      wsRef.current.close(1000, 'Manual disconnect');
       wsRef.current = null;
     }
     setConnected(false);
@@ -138,7 +147,7 @@ export function useWebsocket<T = any>(
       manuallyClosedRef.current = true;
       clearReconnectTimeout();
       if (wsRef.current) {
-        wsRef.current.close(1000, "Component unmount");
+        wsRef.current.close(1000, 'Component unmount');
         wsRef.current = null;
       }
     };
@@ -148,12 +157,14 @@ export function useWebsocket<T = any>(
   const send = useCallback((data: any) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       const toSend =
-        typeof data === "string" || data instanceof Blob || data instanceof ArrayBuffer
+        typeof data === 'string' ||
+        data instanceof Blob ||
+        data instanceof ArrayBuffer
           ? data
           : JSON.stringify(data);
       wsRef.current.send(toSend);
     } else {
-      console.warn("WebSocket not open. Unable to send message.");
+      console.warn('WebSocket not open. Unable to send message.');
     }
   }, []);
 

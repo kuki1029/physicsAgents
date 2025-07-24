@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { BASE_URL } from '@/config';
 
 const axiosInstance = axios.create({
   baseURL: 'http://localhost:8000',
@@ -18,3 +19,5 @@ const axiosInstance = axios.create({
 // }, (error) => Promise.reject(error));
 
 export default axiosInstance;
+
+export const WS_URL = `ws://${BASE_URL}/ws/chat`

@@ -1,27 +1,21 @@
 import { FaArrowLeft } from 'react-icons/fa';
 import { IoMdSend } from 'react-icons/io';
-import { type Chat as SingleChat } from './ChatsList';
 import { useEffect, useState } from 'react';
 import { useWebsocket } from '@/hooks/useWebsocket';
-
-export type ChatMessage = {
-  me: boolean;
-  msg: string;
-};
-
-export type Chat = {
-  id: string;
-  userId: string;
-  messages: ChatMessage[] | [];
-};
+import { WS_URL } from '@/services/api';
+import { ChatUser, Chat, resMsg } from '@/common/types';
+import { IoCheckmarkDoneSharp } from 'react-icons/io5';
 
 interface IChatPage {
   selectedChatId: string;
-  chatInfo: SingleChat;
+  chatInfo: ChatUser;
   chatMsgs: Chat[];
   setSelectedChat: React.Dispatch<React.SetStateAction<string>>;
   setChats: React.Dispatch<React.SetStateAction<Chat[]>>;
 }
+
+const CLASS_NAME =
+  'w-max max-w-[80%] py-1 px-1.5 rounded-lg shadow-md text-sm text-black flex  items-end';
 
 // TODO: UI Bug. doesnt scroll down auto.
 export const ChatPage = ({
@@ -37,42 +31,36 @@ export const ChatPage = ({
   const [newRes, setNewRes] = useState('');
   const [newMsg, setNewMsg] = useState('');
   const [loading, setLoading] = useState(false);
-  const className =
-    'w-max max-w-[80%] py-1 px-1.5 rounded-lg shadow-md text-sm text-black flex  items-end';
 
   // TODO Move up url to somewhere else
-  const { send, connected } = useWebsocket<ChatMessage>(
-    'ws://localhost:8000/ws/chat',
-    {
-      onMessage: (data) => {
-        //TODO: Fix this type
-        if (data.chunk) {
-          const msg = data.chunk as string;
-          setNewRes((prev) => prev + msg);
-        }
-        if (data.response) {
-          setChats((prevChats) =>
-            prevChats.map((chat) => {
-              if (chat.userId === selectedChatId) {
-                return {
-                  ...chat,
-                  messages: [
-                    ...chat.messages,
-                    {
-                      msg: data.response,
-                      me: false,
-                    },
-                  ],
-                };
-              }
-              return chat;
-            }),
-          );
-          setNewRes('');
-        }
+  const { send, connected } = useWebsocket<resMsg>(WS_URL, {
+    onMessage: (data) => {
+      if (data.chunk) {
+        const msg = data.chunk;
+        setNewRes((prev) => prev + msg);
+      }
+      if (data.response) {
+        setChats((prevChats) =>
+          prevChats.map((chat) => {
+            if (chat.userId === selectedChatId) {
+              return {
+                ...chat,
+                messages: [
+                  ...chat.messages,
+                  {
+                    msg: data.response ?? '',
+                    me: false,
+                  },
+                ],
+              };
+            }
+            return chat;
+          }),
+        );
+        setNewRes('');
       }
     },
-  );
+  });
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -97,7 +85,6 @@ export const ChatPage = ({
   };
 
   useEffect(() => {
-    if (loading) setNewRes('...')
     const fn = async () => {
       if (loading && connected) {
         const dataMsg = newMsg;
@@ -133,24 +120,24 @@ export const ChatPage = ({
                 key={i}
                 className={`${
                   me ? 'ml-auto bg-green-100' : 'bg-white'
-                } ${className} ${
+                } ${CLASS_NAME} ${
                   msg.length < 25 ? 'flex-row gap-2' : 'flex-col'
                 }`}
               >
                 <p className="px-1.5 py-0.5">{msg}</p>
 
-                {/* <p className="text-xs text-black/40">
-              {time}
-              {me && (
-                <IoCheckmarkDoneSharp className="mx-1 inline-block text-lg text-sky-500" />
-              )}
-            </p> */}
+                <p className="text-xs text-black/40">
+                  {'time'}
+                  {me && (
+                    <IoCheckmarkDoneSharp className="mx-1 inline-block text-lg text-sky-500" />
+                  )}
+                </p>
               </div>
             ))
           : null}
         {newRes.length ? (
           <div
-            className={`${'bg-white'} ${className} ${
+            className={`${'bg-white'} ${CLASS_NAME} ${
               newRes.length < 25 ? 'flex-row gap-2' : 'flex-col'
             }`}
           >

@@ -1,12 +1,7 @@
-export type Chat = {
-  id: string;
-  name: string;
-  desc: string
-  avatar: string;
-};
+import { ChatUser } from "@/common/types";
 
 interface IChatsList {
-  chats: Chat[];
+  chats: ChatUser[];
   setSelectedChat: React.Dispatch<React.SetStateAction<string>>;
 }
 
