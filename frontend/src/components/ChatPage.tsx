@@ -1,12 +1,13 @@
-import { FaArrowLeft } from 'react-icons/fa';
-import { IoMdSend } from 'react-icons/io';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+
 import { useWebsocket } from '@/hooks/useWebsocket';
 import { WS_URL } from '@/services/api';
-import { ChatUser, Chat, resMsg } from '@/common/types';
-import { IoCheckmarkDoneSharp } from 'react-icons/io5';
+import type { ChatUser, Chat, resMsg } from '@/common/types';
+import { ChatPageHeader } from './ChatPageHeader';
+import { ChatPageInput } from './ChatPageInput';
+import { ChatPageMessages } from './ChatPageMessages';
 
-interface IChatPage {
+interface ChatPageProps {
   selectedChatId: string;
   chatInfo: ChatUser;
   chatMsgs: Chat[];
@@ -14,162 +15,85 @@ interface IChatPage {
   setChats: React.Dispatch<React.SetStateAction<Chat[]>>;
 }
 
-const CLASS_NAME =
-  'w-max max-w-[80%] py-1 px-1.5 rounded-lg shadow-md text-sm text-black flex  items-end';
-
-// TODO: UI Bug. doesnt scroll down auto.
 export const ChatPage = ({
   selectedChatId,
   setSelectedChat,
   chatMsgs,
   chatInfo,
   setChats,
-}: IChatPage) => {
-  const currentChatMsgs = chatMsgs.find(
-    ({ userId }) => userId === selectedChatId,
-  );
-  const [newRes, setNewRes] = useState('');
+}: ChatPageProps) => {
   const [newMsg, setNewMsg] = useState('');
+  const [newRes, setNewRes] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // TODO Move up url to somewhere else
+  const currentChat = useMemo(
+    () => chatMsgs.find((chat) => chat.userId === selectedChatId),
+    [chatMsgs, selectedChatId],
+  );
+
+  const appendMessage = useCallback(
+    (msg: string, me: boolean) => {
+      setChats((prev) =>
+        prev.map((chat) =>
+          chat.userId === selectedChatId
+            ? {
+                ...chat,
+                messages: [...chat.messages, { msg, me }],
+              }
+            : chat,
+        ),
+      );
+    },
+    [selectedChatId, setChats],
+  );
+
   const { send, connected } = useWebsocket<resMsg>(WS_URL, {
     onMessage: (data) => {
       if (data.chunk) {
-        const msg = data.chunk;
-        setNewRes((prev) => prev + msg);
+        setNewRes((prev) => prev + data.chunk);
       }
       if (data.response) {
-        setChats((prevChats) =>
-          prevChats.map((chat) => {
-            if (chat.userId === selectedChatId) {
-              return {
-                ...chat,
-                messages: [
-                  ...chat.messages,
-                  {
-                    msg: data.response ?? '',
-                    me: false,
-                  },
-                ],
-              };
-            }
-            return chat;
-          }),
-        );
+        appendMessage(data.response, false);
         setNewRes('');
       }
     },
   });
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setChats(
-      chatMsgs.map((chat) => {
-        if (chat.userId === selectedChatId) {
-          return {
-            ...chat,
-            messages: [
-              ...chat.messages,
-              {
-                msg: newMsg,
-                me: true,
-              },
-            ],
-          };
-        }
-        return chat;
-      }),
-    );
-    setLoading(true);
-  };
+  const handleSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (!newMsg.trim()) return;
+
+      appendMessage(newMsg, true);
+      setLoading(true);
+    },
+    [newMsg, appendMessage],
+  );
 
   useEffect(() => {
-    const fn = async () => {
-      if (loading && connected) {
-        const dataMsg = newMsg;
-        setNewMsg('');
-        send({ msg: dataMsg, id: chatInfo.id });
-        setLoading(false);
-      }
-    };
-    fn();
-  }, [loading]);
+    if (loading && connected) {
+      send({ msg: newMsg, id: chatInfo.id });
+      setNewMsg('');
+      setLoading(false);
+    }
+  }, [loading, connected, send, newMsg, chatInfo.id]);
 
-  if (!connected) return <p>Connecting...</p>;
+  if (!connected) return <p className="p-4 text-center">Connecting...</p>;
 
   return (
     <main className="min-h-screen bg-[url(https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png)] bg-cover bg-fixed">
-      <header className="sticky top-0 z-30 flex items-center justify-center gap-3 bg-primary-600 px-2 py-2.5 text-white">
-        <FaArrowLeft className="text-xl" onClick={() => setSelectedChat('')} />
-        <img
-          src={chatInfo.avatar}
-          className="h-10 w-10 rounded-full object-cover"
-        />
-
-        <div className="mr-auto flex flex-col">
-          <h4 className="font-medium">{chatInfo.name}</h4>
-          <p className="text-xs text-white/80">online</p>
-        </div>
-      </header>
-
-      <section className="relative flex flex-col gap-3 p-2 pb-44">
-        {currentChatMsgs
-          ? currentChatMsgs.messages.map(({ msg, me }, i) => (
-              <div
-                key={i}
-                className={`${
-                  me ? 'ml-auto bg-green-100' : 'bg-white'
-                } ${CLASS_NAME} ${
-                  msg.length < 25 ? 'flex-row gap-2' : 'flex-col'
-                }`}
-              >
-                <p className="px-1.5 py-0.5">{msg}</p>
-
-                <p className="text-xs text-black/40">
-                  {'time'}
-                  {me && (
-                    <IoCheckmarkDoneSharp className="mx-1 inline-block text-lg text-sky-500" />
-                  )}
-                </p>
-              </div>
-            ))
-          : null}
-        {newRes.length ? (
-          <div
-            className={`${'bg-white'} ${CLASS_NAME} ${
-              newRes.length < 25 ? 'flex-row gap-2' : 'flex-col'
-            }`}
-          >
-            <p className="px-1.5 py-0.5">{newRes}</p>
-          </div>
-        ) : null}
-      </section>
-
-      <form
-        onSubmit={onSubmit}
-        className="fixed bottom-0 left-0 flex w-full items-center gap-2 bg-red-500/0 bg-[url(https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png)] p-2 pt-0.5"
-      >
-        <div className="flex flex-grow items-center gap-3 rounded-full border bg-white p-2 text-black/50">
-          {/* <p>
-            <GrEmoji className="text-2xl" />
-          </p> */}
-          <input
-            value={newMsg}
-            onChange={(e) => setNewMsg(e.target.value)}
-            name="msg"
-            className="w-full flex-grow text-black outline-none"
-            type="text"
-            required
-            disabled={!!newRes.length}
-            placeholder="Type a message"
-          />
-        </div>
-
-        <button type="submit" className="rounded-full bg-primary p-3">
-          <IoMdSend className="text-xl text-white" />
-        </button>
-      </form>
+      <ChatPageHeader
+        setSelectedChat={setSelectedChat}
+        name={chatInfo.name}
+        avatar={chatInfo.avatar}
+      />
+      <ChatPageMessages latestMsg={newRes} currentChatMsg={currentChat} />
+      <ChatPageInput
+        handleSubmit={handleSubmit}
+        newMsg={newMsg}
+        setNewMsg={setNewMsg}
+        newResponse={newRes}
+      />
     </main>
   );
 };
