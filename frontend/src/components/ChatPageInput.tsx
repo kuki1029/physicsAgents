@@ -1,4 +1,4 @@
-import React, { RefObject } from 'react';
+import { type RefObject } from 'react';
 import { IoMdSend } from 'react-icons/io';
 
 interface IChatPageInput {
@@ -6,7 +6,8 @@ interface IChatPageInput {
   newMsg: string;
   setNewMsg: React.Dispatch<React.SetStateAction<string>>;
   newResponse: string;
-  inputRef: RefObject<HTMLInputElement>
+  inputRef: RefObject<HTMLInputElement>;
+  connected: boolean;
 }
 
 export const ChatPageInput = ({
@@ -14,7 +15,8 @@ export const ChatPageInput = ({
   newMsg,
   setNewMsg,
   newResponse,
-  inputRef
+  inputRef,
+  connected,
 }: IChatPageInput) => {
   return (
     <form
@@ -26,9 +28,9 @@ export const ChatPageInput = ({
           value={newMsg}
           onChange={(e) => setNewMsg(e.target.value)}
           type="text"
-          placeholder="Type a message"
+          placeholder={connected ? 'Type a message' : 'Loading...'}
           required
-          disabled={!!newResponse}
+          disabled={!!newResponse || !connected}
           className="w-full flex-grow bg-transparent text-black outline-none"
           ref={inputRef}
         />

@@ -2,18 +2,19 @@ import { useState } from 'react';
 import { Header } from './components/Header';
 import { ChatsList } from './components/ChatsList';
 import { ChatPage } from './components/ChatPage';
-import { defaultChatsList, chatMessages, ChatUser, Chat  } from './common/types';
+import { defaultChatsList, chatMessages, type Chat } from './common/types';
 
 const App = () => {
-  const [chats, _setChats] = useState<ChatUser[]>(defaultChatsList);
   const [msgs, setMsgs] = useState<Chat[]>(chatMessages);
   const [selectedChat, setSelectedChat] = useState('');
+  const chatInfo = defaultChatsList.find(({ id }) => id === selectedChat);
+  //TODO: Add better error page and ability to go back
 
-  if (selectedChat) {
+  if (selectedChat && chatInfo) {
     return (
       <ChatPage
         selectedChatId={selectedChat}
-        chatInfo={defaultChatsList[0]}
+        chatInfo={chatInfo}
         chatMsgs={msgs}
         setSelectedChat={setSelectedChat}
         setChats={setMsgs}
@@ -24,7 +25,7 @@ const App = () => {
   return (
     <>
       <Header />
-      <ChatsList chats={chats} setSelectedChat={setSelectedChat} />
+      <ChatsList chats={defaultChatsList} setSelectedChat={setSelectedChat} />
     </>
   );
 };

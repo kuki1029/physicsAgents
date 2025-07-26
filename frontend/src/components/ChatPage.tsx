@@ -35,20 +35,32 @@ export const ChatPage = ({
   // Helper function to add new msgs to queue
   const appendMessage = useCallback(
     (msg: string, me: boolean) => {
-      setChats((prev) =>
-        prev.map((chat) =>
-          chat.userId === selectedChatId
-            ? {
-                ...chat,
-                messages: [...chat.messages, { msg, me }],
-              }
-            : chat,
-        ),
-      );
+      setChats((prev) => {
+        const chatExists = prev.some((chat) => chat.userId === selectedChatId);
+
+        if (chatExists) {
+          return prev.map((chat) =>
+            chat.userId === selectedChatId
+              ? {
+                  ...chat,
+                  messages: [...chat.messages, { msg, me }],
+                }
+              : chat,
+          );
+        } else {
+          return [
+            ...prev,
+            {
+              id: String(prev.length + 1), // or use uuid or timestamp
+              userId: selectedChatId ?? 'unknown',
+              messages: [{ msg, me }],
+            },
+          ];
+        }
+      });
     },
     [selectedChatId, setChats],
   );
-
   const { send, connected } = useWebsocket<resMsg>(WS_URL, {
     onMessage: (data) => {
       if (data.chunk) {
@@ -101,6 +113,7 @@ export const ChatPage = ({
         setNewMsg={setNewMsg}
         newResponse={newRes}
         inputRef={inputRef}
+        connected={connected}
       />
     </main>
   );
