@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { RefObject } from 'react';
 import { IoMdSend } from 'react-icons/io';
 
 interface IChatPageInput {
@@ -6,6 +6,7 @@ interface IChatPageInput {
   newMsg: string;
   setNewMsg: React.Dispatch<React.SetStateAction<string>>;
   newResponse: string;
+  inputRef: RefObject<HTMLInputElement>
 }
 
 export const ChatPageInput = ({
@@ -13,6 +14,7 @@ export const ChatPageInput = ({
   newMsg,
   setNewMsg,
   newResponse,
+  inputRef
 }: IChatPageInput) => {
   return (
     <form
@@ -28,6 +30,7 @@ export const ChatPageInput = ({
           required
           disabled={!!newResponse}
           className="w-full flex-grow bg-transparent text-black outline-none"
+          ref={inputRef}
         />
       </div>
 

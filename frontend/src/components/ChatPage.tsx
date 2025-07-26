@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 
 import { useWebsocket } from '@/hooks/useWebsocket';
 import { WS_URL } from '@/services/api';
@@ -25,12 +25,14 @@ export const ChatPage = ({
   const [newMsg, setNewMsg] = useState('');
   const [newRes, setNewRes] = useState('');
   const [loading, setLoading] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const currentChat = useMemo(
     () => chatMsgs.find((chat) => chat.userId === selectedChatId),
     [chatMsgs, selectedChatId],
   );
 
+  // Helper function to add new msgs to queue
   const appendMessage = useCallback(
     (msg: string, me: boolean) => {
       setChats((prev) =>
@@ -55,6 +57,7 @@ export const ChatPage = ({
       if (data.response) {
         appendMessage(data.response, false);
         setNewRes('');
+        inputRef.current?.focus();
       }
     },
   });
@@ -70,6 +73,7 @@ export const ChatPage = ({
     [newMsg, appendMessage],
   );
 
+  // Send msg to ws when loading changes
   useEffect(() => {
     if (loading && connected) {
       send({ msg: newMsg, id: chatInfo.id });
@@ -78,7 +82,10 @@ export const ChatPage = ({
     }
   }, [loading, connected, send, newMsg, chatInfo.id]);
 
-  if (!connected) return <p className="p-4 text-center">Connecting...</p>;
+  // Focus input on new msgs
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, [chatMsgs, newRes, connected]);
 
   return (
     <main className="min-h-screen bg-[url(https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png)] bg-cover bg-fixed">
@@ -93,6 +100,7 @@ export const ChatPage = ({
         newMsg={newMsg}
         setNewMsg={setNewMsg}
         newResponse={newRes}
+        inputRef={inputRef}
       />
     </main>
   );

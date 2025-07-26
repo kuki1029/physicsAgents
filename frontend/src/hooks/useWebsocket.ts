@@ -12,7 +12,7 @@ interface IWebsocketOptions<T> {
   manualStart?: boolean; // if true, connect() must be called manually
 }
 
-export function useWebsocket<T = any>(
+export function useWebsocket<T>(
   url: string,
   options: IWebsocketOptions<T> = {},
 ) {
@@ -27,7 +27,6 @@ export function useWebsocket<T = any>(
     reconnectDecay = 1.5,
     manualStart = false,
   } = options;
-console.log(url)
   const wsRef = useRef<WebSocket | null>(null);
   // Track number of reconnect attempts
   const reconnectAttemptsRef = useRef(0);
@@ -76,7 +75,6 @@ console.log(url)
 
       ws.onopen = () => {
         reconnectAttemptsRef.current = 0;
-        console.log('A');
         setConnected(true);
         onOpenRef.current?.();
       };
@@ -87,7 +85,7 @@ console.log(url)
           onMessageRef.current?.(data);
         } catch {
           // If not JSON, still pass raw data (string or binary)
-          onMessageRef.current?.(event.data as any);
+          onMessageRef.current?.(event.data);
         }
       };
 
@@ -154,7 +152,7 @@ console.log(url)
   }, [connect, manualStart]);
 
   // Send function supporting string or binary data
-  const send = useCallback((data: any) => {
+  const send = useCallback((data: unknown) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       const toSend =
         typeof data === 'string' ||
