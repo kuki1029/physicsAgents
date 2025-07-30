@@ -1,15 +1,38 @@
 from physicsAgents.application.conversation.workflow.graph import initiate_workflow
-from typing import AsyncGenerator
-from langchain_core.messages import AIMessageChunk
+from typing import AsyncGenerator, Any
+from langchain_core.messages import AIMessageChunk, HumanMessage, AIMessage
+import uuid
 
 
-async def get_ws_chat_res(messages: str) -> AsyncGenerator[str, None]:
-    """TODO"""
+async def get_ws_chat_res(
+    messages: str | list[str] | list[dict[str, Any]],
+    phys_id: str,
+    phys_name: str,
+    phys_style: str,
+    new_thread: bool = False,
+) -> AsyncGenerator[str, None]:
+    """Sends conversation details through workflow graph and gets streaming response
+
+    Args:
+        messages: Initial message or thread of messages (with metadata) for the conversation
+        phys_id: ID of the physicist
+        phys_name: Name of the physicist
+        phys_style: Talking style of the physicist
+        new_thread: Whether to start a new conversation or not for a new user
+
+    Returns:
+        tuple[str, PhysicistState]: Tuple contains content of most recent msg and state of workflow
+    """
     graph = initiate_workflow().compile()
 
     try:
+        # TODO: Generate this based on userID from FE and store keys as needed
+        thread_id = phys_id if not new_thread else f"{phys_id}-{uuid.uuid4()}"
+
+        config = {"configurable": {"thread_id": thread_id}}
+
         async for text in graph.astream(
-            input={"messages": messages}, stream_mode="messages"
+            input={"messages": messages}, config=config, stream_mode="messages"
         ):
             # TODO use types for conversation as its confusing
             if text[1]["langgraph_node"] == "conversation" and isinstance(
@@ -47,3 +70,21 @@ async def get_chat_response(messages: str) -> str:
         return msg.content
     except Exception as e:
         raise RuntimeError(f"Could not get response: {str(e)}") from e
+
+
+def __format_messages(
+    msgs: str | list[dict[str, Any]],
+) -> list[HumanMessage | AIMessage]:
+    """Convert different formats of msgs to Langchain msg objects
+    
+    Args:
+        msgs: Can be str, list of str, dict with role, content keys
+        
+    Returns:
+        List[HumanMessage | AIMessage]: List of langchain msg objects 
+    """
+    if isinstance(msgs, str):
+        return [HumanMessage(content=msgs)]
+    
+    if isinstance(msgs, list)
+        

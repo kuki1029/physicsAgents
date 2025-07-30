@@ -88,7 +88,7 @@ export const ChatPage = ({
   // Send msg to ws when loading changes
   useEffect(() => {
     if (loading && connected) {
-      send({ msg: newMsg, id: chatInfo.id });
+      send({ msg: newMsg, physicist_id: chatInfo.id });
       setNewMsg('');
       setLoading(false);
     }

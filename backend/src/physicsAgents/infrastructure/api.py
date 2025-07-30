@@ -9,6 +9,8 @@ from physicsAgents.application.conversation.get_response import (
     get_ws_chat_res,
 )
 
+from physicsAgents.domain.physicist_factory import PhysicistFactory
+
 app = FastAPI()
 
 # TODO Block this to specific frontend
@@ -39,12 +41,15 @@ async def stream_chat(websocket: WebSocket):
         while True:
             data = await websocket.receive_json()
 
-            if "msg" not in data:
+            if "msg" not in data or "physicist_id" not in data:
                 await websocket.send_json(
-                    {"error": "Message format invalid. Missing msg."}
+                    {"error": "Message format invalid. Missing msg and physicist_id."}
                 )
                 continue
             try:
+                physicist_factory = PhysicistFactory()
+                physicist = physicist_factory.get_physicist(data["physicist_id"])
+
                 res = get_ws_chat_res(
                     messages=data["msg"]
                 )  # TODO: Can use similar logic to chat api?
