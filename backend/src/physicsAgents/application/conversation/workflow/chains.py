@@ -1,6 +1,7 @@
 from langchain_groq import ChatGroq
 from physicsAgents.settings import settings
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from physicsAgents.domain.prompts import PHYSICIST_CHARACTER_CARD
 
 
 def get_agent_response_chain():
@@ -12,7 +13,7 @@ def get_agent_response_chain():
 
     prompt = ChatPromptTemplate.from_messages(
         [
-            ("system", "You are Stephen Hawking. Responses do not exceed 80 words."),
+            ("system", PHYSICIST_CHARACTER_CARD.prompt),
             MessagesPlaceholder(variable_name="messages"),
         ],
         # Can use other formats like f-string but jinja2 offers most flexibility and syntax

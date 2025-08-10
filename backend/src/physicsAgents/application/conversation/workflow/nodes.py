@@ -9,6 +9,8 @@ async def conversation_node(state, config):
     response = await conversation_chain.ainvoke(
         {
             "messages": state["messages"],
+            "physicist_name": state["physicist_name"],
+            "physicist_style": state["physicist_style"],
         },
         config,
     )

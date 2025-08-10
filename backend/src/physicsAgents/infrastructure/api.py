@@ -51,8 +51,11 @@ async def stream_chat(websocket: WebSocket):
                 physicist = physicist_factory.get_physicist(data["physicist_id"])
 
                 res = get_ws_chat_res(
-                    messages=data["msg"]
-                )  # TODO: Can use similar logic to chat api?
+                    messages=data["msg"],
+                    phys_id=data["physicist_id"],
+                    phys_name=physicist.name,
+                    phys_style=physicist.style,
+                )
 
                 await websocket.send_json({"streaming": True})
 
