@@ -30,3 +30,22 @@ __CHARACTER_CARD = """
 PHYSICIST_CHARACTER_CARD = Prompt(
     name="physicist_character_card", prompt=__CHARACTER_CARD
 )
+
+__SUMMARY_PROMPT = """
+Create a summary of the follow conversation between the user and {{physicist_name}}.
+Retain relevant and cruical information but keep the summary short. It should accurately describe
+the conversation so far between the user and {{physicist_name}}. 
+"""
+
+__EXTEND_SUMMARY = """
+This is a summary of the conversation between {{physicist_name}} and the user:
+
+{{summary}}
+
+Extend this summary by taking into account the new messages. Retain crucial and relevant information
+but keep the summary short. 
+"""
+
+SUMMARY_PROMPT = Prompt(name="summary_prompt", prompt=__SUMMARY_PROMPT)
+
+EXTEND_PROMPT = Prompt(name="extend_summary_prompt", prompt=__EXTEND_SUMMARY)
