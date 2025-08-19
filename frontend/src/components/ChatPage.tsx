@@ -6,6 +6,7 @@ import type { ChatUser, Chat, resMsg } from '@/common/types';
 import { ChatPageHeader } from './ChatPageHeader';
 import { ChatPageInput } from './ChatPageInput';
 import { ChatPageMessages } from './ChatPageMessages';
+import { getUUID } from '@/utility/getUUID';
 
 interface ChatPageProps {
   selectedChatId: string;
@@ -61,6 +62,7 @@ export const ChatPage = ({
     },
     [selectedChatId, setChats],
   );
+
   const { send, connected } = useWebsocket<resMsg>(WS_URL, {
     onMessage: (data) => {
       if (data.chunk) {
@@ -88,7 +90,7 @@ export const ChatPage = ({
   // Send msg to ws when loading changes
   useEffect(() => {
     if (loading && connected) {
-      send({ msg: newMsg, physicist_id: chatInfo.id });
+      send({ user_id: getUUID(), msg: newMsg, physicist_id: chatInfo.id });
       setNewMsg('');
       setLoading(false);
     }

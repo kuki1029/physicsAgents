@@ -13,7 +13,7 @@ async def get_ws_chat_res(
     phys_id: str,
     phys_name: str,
     phys_style: str,
-    new_thread: bool = False,
+    user_id: str = "",
 ) -> AsyncGenerator[str, None]:
     """Sends conversation details through workflow graph and gets streaming response
 
@@ -30,8 +30,7 @@ async def get_ws_chat_res(
     graph = initiate_workflow().compile(checkpointer=checkpointer)
 
     try:
-        # TODO: Generate this based on userID from FE and store keys as needed
-        thread_id = phys_id if not new_thread else f"{phys_id}-{uuid.uuid4()}"
+        thread_id = f"{user_id}-{phys_id}"
 
         config = {"configurable": {"thread_id": thread_id}}
         async for text in graph.astream(

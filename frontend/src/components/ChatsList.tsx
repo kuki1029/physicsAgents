@@ -1,4 +1,4 @@
-import { ChatUser } from "@/common/types";
+import type { ChatUser } from '@/common/types';
 
 interface IChatsList {
   chats: ChatUser[];
@@ -23,7 +23,7 @@ export const ChatsList = ({ chats, setSelectedChat }: IChatsList) => {
               <h4 className="flex justify-between text-base font-medium text-gray-800">
                 <span>{chat.name}</span>
               </h4>
-              <p className="flex font-light text-xs text-gray-400">
+              <p className="flex text-xs font-light  text-gray-400">
                 <span>{chat.desc}</span>
               </p>
             </div>

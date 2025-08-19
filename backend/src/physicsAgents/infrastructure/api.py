@@ -55,6 +55,7 @@ async def stream_chat(websocket: WebSocket):
                     phys_id=data["physicist_id"],
                     phys_name=physicist.name,
                     phys_style=physicist.style,
+                    user_id=data.get("user_id", None),
                 )
 
                 await websocket.send_json({"streaming": True})

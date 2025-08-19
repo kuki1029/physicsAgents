@@ -5,4 +5,5 @@ export type chatData = {
     id: string
 }
 
+// OLD
 export const sendChat = (chatData: chatData) => axios.post('/chat', chatData);
