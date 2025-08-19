@@ -1,8 +1,8 @@
 export const Header = () => {
   return (
-    <header className="bg-primary text-white sticky top-0">
-      <div className="flex items-center gap-4 p-4 relative">
-        <h2 className="text-xl font-normal mr-auto">Physicists</h2>
+    <header className="sticky top-0 bg-primary text-white">
+      <div className="relative flex items-center gap-4 p-4">
+        <h2 className="mr-auto text-xl font-normal">Physicists</h2>
       </div>
     </header>
   );

@@ -1,4 +1,4 @@
-import { Chat } from '@/common/types';
+import type { Chat } from '@/common/types';
 import { useCallback, useEffect, useRef } from 'react';
 
 interface IChatPageMessages {
@@ -33,7 +33,7 @@ export const ChatPageMessages = ({
         <div
           key={i}
           className={`${
-            me ? 'ml-auto bg-green-100' : 'bg-white'
+            me ? 'ml-auto bg-blue-200' : 'bg-white'
           } ${BUBBLE_BASE_STYLE} ${
             msg.length < 25 ? 'flex-row gap-2' : 'flex-col'
           }`}

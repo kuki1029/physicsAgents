@@ -21,9 +21,9 @@ export const ChatPageInput = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="fixed bottom-0 left-0 flex w-full items-center gap-2 bg-[url(https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png)] p-2 pt-0.5"
+      className="fixed bottom-0 left-0 flex w-full items-center gap-2 p-2 pt-0.5"
     >
-      <div className="flex flex-grow items-center gap-3 rounded-full border bg-white p-2 text-black/50">
+      <div className="flex flex-grow items-center gap-3 rounded-full border bg-zinc-200 p-2 text-black/50">
         <input
           value={newMsg}
           onChange={(e) => setNewMsg(e.target.value)}

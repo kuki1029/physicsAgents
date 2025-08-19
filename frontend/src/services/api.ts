@@ -20,4 +20,4 @@ const axiosInstance = axios.create({
 
 export default axiosInstance;
 
-export const WS_URL = `ws://${BASE_URL}/ws/chat`
+export const WS_URL = `ws://${BASE_URL}/ws/chat`;

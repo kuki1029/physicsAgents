@@ -13,7 +13,7 @@ export const ChatPageHeader = ({
   name,
 }: IChatPageHeader) => {
   return (
-    <header className="sticky top-0 z-30 flex items-center gap-3 bg-primary-600 px-2 py-2.5 text-white">
+    <header className="sticky top-0 z-30 flex items-center gap-3 bg-primary px-2 py-2.5 text-white">
       <FaArrowLeft
         className="cursor-pointer text-xl"
         onClick={() => setSelectedChat('')}

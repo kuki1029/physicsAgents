@@ -18,15 +18,14 @@ export type Chat = {
 export type ChatUser = {
   id: string;
   name: string;
-  desc: string
+  desc: string;
   avatar: string;
 };
 
 export type resMsg = {
-    chunk?: string
-    response?: string
-}
-
+  chunk?: string;
+  response?: string;
+};
 
 export const defaultChatsList: ChatUser[] = [
   {
