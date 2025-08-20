@@ -8,7 +8,6 @@ const App = () => {
   const [msgs, setMsgs] = useState<Chat[]>(chatMessages);
   const [selectedChat, setSelectedChat] = useState('');
   const chatInfo = defaultChatsList.find(({ id }) => id === selectedChat);
-  //TODO: Add better error page and ability to go back
 
   if (selectedChat && chatInfo) {
     return (
