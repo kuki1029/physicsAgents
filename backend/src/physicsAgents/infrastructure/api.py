@@ -9,14 +9,17 @@ from physicsAgents.application.conversation.get_response import (
     get_ws_chat_res,
 )
 
+from physicsAgents.settings import settings
+
 from physicsAgents.domain.physicist_factory import PhysicistFactory
 
 app = FastAPI()
 
+
 # TODO Block this to specific frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://physbot.imkunal.ca" if settings.MODE == "PROD" else "*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
