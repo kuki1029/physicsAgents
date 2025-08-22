@@ -20,4 +20,4 @@ const axiosInstance = axios.create({
 
 export default axiosInstance;
 
-export const WS_URL = import.meta.env.MODE === 'production' ? `wss://${BASE_URL}/ws/chat` : `ws://${BASE_URL}/ws/chat`;
+export const WS_URL = import.meta.env.MODE === 'production' ? `wss://${BASE_URL}/api/ws/chat` : `ws://${BASE_URL}/ws/chat`;
