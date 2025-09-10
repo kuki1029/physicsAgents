@@ -1,7 +1,10 @@
 from langgraph.graph import END, START, StateGraph
+from langgraph.prebuilt import tools_condition
 from physicsAgents.application.conversation.workflow.nodes import (
     conversation_node,
     summarize_conversation_node,
+    retriever_node,
+    connector_node,
 )
 from physicsAgents.application.conversation.workflow.edges import should_summarize
 from physicsAgents.application.conversation.workflow.state import PhysicistState
@@ -15,10 +18,20 @@ def initiate_workflow():
     """
     graph_builder = StateGraph(PhysicistState)
 
+    # Define all nodes
     graph_builder.add_node("conversation", conversation_node)
+    graph_builder.add_node("retrieve_physicist_context", retriever_node)
     graph_builder.add_node("summarize", summarize_conversation_node)
+    graph_builder.add_node("connector", connector_node)
 
     graph_builder.add_edge(START, "conversation")
+    graph_builder.add_conditional_edges(
+        "conversation",
+        tools_condition,
+        {"tools": "retrieve_physicist_context", END: "connector"},
+    )
+
+    graph_builder.add_edge("retrieve_physicist_context", "conversation")
     graph_builder.add_conditional_edges("conversation", should_summarize)
     graph_builder.add_edge("summarize", END)
 

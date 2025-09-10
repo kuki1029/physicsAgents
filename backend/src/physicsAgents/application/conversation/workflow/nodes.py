@@ -3,10 +3,14 @@ from physicsAgents.application.conversation.workflow.chains import (
     get_conversation_summary_chain,
 )
 from physicsAgents.application.conversation.workflow.state import PhysicistState
+from physicsAgents.application.conversation.workflow.tools import tools
 from langchain_core.runnables import RunnableConfig
 from langchain_core.messages import RemoveMessage
+from langgraph.prebuilt import ToolNode
 
 MESSAGES_TO_KEEP = 10
+
+retriever_node = ToolNode(tools)
 
 
 async def conversation_node(state: PhysicistState, config: RunnableConfig):
@@ -45,3 +49,8 @@ async def summarize_conversation_node(state: PhysicistState):
     ]
 
     return {"summary": res.content, "messages": del_msgs}
+
+
+# Placeholder to make my code more readable
+async def connector_node(state: PhysicistState):
+    return {}
