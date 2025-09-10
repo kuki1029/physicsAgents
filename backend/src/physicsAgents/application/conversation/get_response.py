@@ -1,11 +1,8 @@
 from physicsAgents.application.conversation.workflow.graph import initiate_workflow
 from typing import AsyncGenerator, Any
-from langchain_core.messages import AIMessageChunk, HumanMessage, AIMessage
-import uuid
-from langgraph.checkpoint.memory import InMemorySaver
-
-
-checkpointer = InMemorySaver()
+from langchain_core.messages import AIMessageChunk
+from langgraph.checkpoint.mongodb import AsyncMongoDBSaver
+from physicsAgents.settings import settings
 
 
 async def get_ws_chat_res(
@@ -27,26 +24,34 @@ async def get_ws_chat_res(
     Returns:
         tuple[str, PhysicistState]: Tuple contains content of most recent msg and state of workflow
     """
-    graph = initiate_workflow().compile(checkpointer=checkpointer)
 
     try:
-        thread_id = f"{user_id}-{phys_id}"
+        async with AsyncMongoDBSaver.from_conn_string(
+            conn_string=settings.MONGO_URI,
+            db_name=settings.MONGO_DB_NAME,
+            checkpoint_collection_name=settings.MONGO_STATE_CHECKPOINT,
+            writes_collection_name=settings.MONGO_STATE_WRITES,
+        ) as checkpointer:
 
-        config = {"configurable": {"thread_id": thread_id}}
-        async for text in graph.astream(
-            input={
-                "messages": messages,
-                "physicist_name": phys_name,
-                "physicist_style": phys_style,
-            },
-            config=config,
-            stream_mode="messages",
-        ):
-            # TODO use types for conversation as its confusing
-            if text[1]["langgraph_node"] == "conversation" and isinstance(
-                text[0], AIMessageChunk
+            graph = initiate_workflow().compile(checkpointer=checkpointer)
+
+            thread_id = f"{user_id}-{phys_id}"
+
+            config = {"configurable": {"thread_id": thread_id}}
+            async for text in graph.astream(
+                input={
+                    "messages": messages,
+                    "physicist_name": phys_name,
+                    "physicist_style": phys_style,
+                },
+                config=config,
+                stream_mode="messages",
             ):
-                yield text[0].content
+                # TODO use types for conversation as its confusing
+                if text[1]["langgraph_node"] == "conversation" and isinstance(
+                    text[0], AIMessageChunk
+                ):
+                    yield text[0].content
 
     except Exception as e:
         print(e)
@@ -79,20 +84,3 @@ async def get_chat_response(messages: str) -> str:
         return msg.content
     except Exception as e:
         raise RuntimeError(f"Could not get response: {str(e)}") from e
-
-
-# def __format_messages(
-#     msgs: str | list[dict[str, Any]],
-# ) -> list[HumanMessage | AIMessage]:
-#     """Convert different formats of msgs to Langchain msg objects
-
-#     Args:
-#         msgs: Can be str, list of str, dict with role, content keys
-
-#     Returns:
-#         List[HumanMessage | AIMessage]: List of langchain msg objects
-#     """
-#     if isinstance(msgs, str):
-#         return [HumanMessage(content=msgs)]
-
-#     if isinstance(msgs, list)

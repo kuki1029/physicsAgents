@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
-
 from pydantic import BaseModel
 
 from physicsAgents.application.conversation.get_response import (

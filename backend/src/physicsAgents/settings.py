@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     # MongoDB
     MONGO_DB_NAME: str = "physagents"
     MONGO_URI: str
+    MONGO_STATE_CHECKPOINT: str = "physagent_state_checkpoints"
+    MONGO_STATE_WRITES: str = "physagent_state_writes"
     MONGO_LONG_TERM_MEMORY_COLLECTION: str = "physagent_long_term_memory"
 
     # For RAG
