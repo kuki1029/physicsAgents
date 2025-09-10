@@ -23,21 +23,21 @@ def get_retriever(
         devices (str): Specify either cpu or cuda or device to run model on
     """
     embedding_model = get_hf_embedding_model(embedding_model_id, device)
-    
+
     # TODO: Setup mongoDB
     vector_store = MongoDBAtlasVectorSearch.from_connection_string(
-        connection_string="", 
+        connection_string="s",
         embedding=embedding_model,
-        namespace=f"{""}.{""}"
+        namespace="s",
         text_key="chunk",
         embedding_key="embedding",
-        relevance_score_fn="dotProduct"
+        relevance_score_fn="dotProduct",
     )
-    
+
     return MongoDBAtlasHybridSearchRetriever(
         vectorstore=vector_store,
         search_index_name="hybrid_search_index",
         top_k=num_of_docs,
         vector_penalty=50,
-        fulltext_penalty=50
+        fulltext_penalty=50,
     )

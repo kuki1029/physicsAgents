@@ -11,6 +11,20 @@ services:
     networks:
       - physagent-network
 
+  database:
+    image: mongodb/mongodb-atlas-local:8.0
+    hostname: dev_atlas
+    ports:
+      - 5432:5432
+    environment:
+      MONGODB_INITDB_ROOT_USERNAME: ${MONGODB_USER}
+      MONGODB_INITDB_ROOT_PASSWORD: ${MONGODB_PASS}
+    volumes:
+      - data:/data/database
+      - config:/data/configdb  # For clusters, shared config
+    networks:
+      - physagent-network
+
   frontend:
     container_name: physagent-frontend
     build:
@@ -22,7 +36,11 @@ services:
       - backend
     networks:
       - physagent-network
-    
+  
+volumes:
+  data:
+  config:
+  
 networks:
   physagent-network:
     name: physagent-network
