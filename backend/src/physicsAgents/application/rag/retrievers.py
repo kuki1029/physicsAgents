@@ -26,9 +26,9 @@ def get_retriever(
 
     # TODO: Setup mongoDB
     vector_store = MongoDBAtlasVectorSearch.from_connection_string(
-        connection_string="s",
+        connection_string=settings.MONGO_URI,
         embedding=embedding_model,
-        namespace="s",
+        namespace=f"{settings.MONGO_DB_NAME}.{settings.MONGO_LONG_TERM_MEMORY_COLLECTION}",
         text_key="chunk",
         embedding_key="embedding",
         relevance_score_fn="dotProduct",

@@ -3,7 +3,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 Splitter = RecursiveCharacterTextSplitter
 
 
-def get_splitter(chunk_size: int) -> Splitter:
+#  256 is enough as working on cpu
+def get_splitter(chunk_size: int = 256) -> Splitter:
     """
     Returns a text splitter with 15% overlap and same tokenzier as gpt-4
     """

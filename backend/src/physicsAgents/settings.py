@@ -14,7 +14,16 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str
     GROQ_LLM_MODEL: str = "llama-3.3-70b-versatile"
     GROQ_LLM_MODEL_CONTEXT_SUMMARY: str = "llama-3.1-8b-instant"
+
     MODE: str = "DEV"
+
+    # MongoDB
+    MONGO_DB_NAME: str = "physagents"
+    MONGO_URI: str
+    MONGO_LONG_TERM_MEMORY_COLLECTION: str = "physagent_long_term_memory"
+
+    # For RAG
+    RAG_EMBEDDING_MODEL: str = "intfloat/multilingual-e5-small"
 
 
 settings = Settings()
