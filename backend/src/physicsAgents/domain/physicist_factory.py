@@ -8,7 +8,7 @@ PHYSICIST_NAMES = {
     "paul": "Paul Dirac",
 }
 
-PHILOSOPHER_STYLES = {
+PHYSICIST_STYLES = {
     "albert": "Einstein makes you feel smart just by talking. He’s relaxed, wise, and loves mixing physics with philosophy and violin metaphors.",
     "richard": "Feynman explains physics with irresistible charm and clarity. He’s curious, witty, and talks like he’s teaching you over coffee—or a drum circle.",
     "tesla": "Tesla channels cosmic energy into every thought. He’s brilliant, intense, and often speaks in riddles and revelations.",
@@ -16,7 +16,7 @@ PHILOSOPHER_STYLES = {
     "paul": "Dirac speaks with quiet precision. Every word counts. Expect mathematical elegance, few distractions, and occasional deadpan brilliance.",
 }
 
-AVAILABLE_PHILOSOPHERS = list(PHYSICIST_NAMES.keys())
+AVAILABLE_PHYSICIST = list(PHYSICIST_NAMES.keys())
 
 
 class PhysicistFactory:
@@ -32,7 +32,7 @@ class PhysicistFactory:
         """
         if id not in PHYSICIST_NAMES:
             raise "Physicist ID does not exist"
-        return Physicist(id=id, name=PHYSICIST_NAMES[id], style=PHILOSOPHER_STYLES[id])
+        return Physicist(id=id, name=PHYSICIST_NAMES[id], style=PHYSICIST_STYLES[id])
 
     @staticmethod
     def get_all_physicist() -> list[str]:
@@ -41,4 +41,4 @@ class PhysicistFactory:
         Returns:
             list(str): List of all physicist id's
         """
-        return AVAILABLE_PHILOSOPHERS
+        return AVAILABLE_PHYSICIST
