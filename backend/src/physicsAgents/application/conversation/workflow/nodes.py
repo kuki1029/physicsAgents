@@ -1,6 +1,7 @@
 from physicsAgents.application.conversation.workflow.chains import (
     get_agent_response_chain,
     get_conversation_summary_chain,
+    get_context_summary_chain,
 )
 from physicsAgents.application.conversation.workflow.state import PhysicistState
 from physicsAgents.application.conversation.workflow.tools import tools
@@ -49,6 +50,15 @@ async def summarize_conversation_node(state: PhysicistState):
     ]
 
     return {"summary": res.content, "messages": del_msgs}
+
+
+async def summarize_context_node(state: PhysicistState):
+    summary_chain = get_context_summary_chain()
+
+    res = await summary_chain.ainvoke({"context": state["messages"][-1].content})
+    state["messages"][-1].content = res.content
+
+    return {}
 
 
 # Placeholder to make my code more readable

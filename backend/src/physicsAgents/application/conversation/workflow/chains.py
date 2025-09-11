@@ -5,6 +5,7 @@ from physicsAgents.domain.prompts import (
     PHYSICIST_CHARACTER_CARD,
     EXTEND_PROMPT,
     SUMMARY_PROMPT,
+    CONTEXT_PROMPT,
 )
 
 
@@ -39,6 +40,21 @@ def get_conversation_summary_chain(summary: str = ""):
     prompt = ChatPromptTemplate.from_messages(
         [MessagesPlaceholder(variable_name="messages"), ("human", summary.prompt)],
         template_format="jinja2",
+    )
+
+    return prompt | model
+
+
+def get_context_summary_chain():
+    # TODO: Simplify the model functions as reused
+    model = ChatGroq(
+        api_key=settings.GROQ_API_KEY,
+        model_name=settings.GROQ_LLM_MODEL_CONTEXT_SUMMARY,
+        temperature=0.7,
+    )
+
+    prompt = ChatPromptTemplate.from_messages(
+        ["human", CONTEXT_PROMPT], template_format="jinja2"
     )
 
     return prompt | model

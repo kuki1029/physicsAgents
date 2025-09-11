@@ -49,3 +49,11 @@ but keep the summary short.
 SUMMARY_PROMPT = Prompt(name="summary_prompt", prompt=__SUMMARY_PROMPT)
 
 EXTEND_PROMPT = Prompt(name="extend_summary_prompt", prompt=__EXTEND_SUMMARY)
+
+__CONTEXT_SUMMARY = """Summarize the following context in under 50 words. 
+Return only the summary as plain text — no introductions, disclaimers, or extra formatting.
+
+Context:
+{{context}}"""
+
+CONTEXT_PROMPT = Prompt(name="context_summary_prompt", prompt=__CONTEXT_SUMMARY)
