@@ -24,8 +24,8 @@ class Settings(BaseSettings):
     MONGO_STATE_WRITES: str = "physagent_state_writes"
     MONGO_LONG_TERM_MEMORY_COLLECTION: str = "physagent_long_term_memory"
 
-    # For RAG
-    RAG_EMBEDDING_MODEL: str = "intfloat/multilingual-e5-small"
+    # For RAG. Using this model to avoid needing sentence-transformers as on metered conn
+    RAG_EMBEDDING_MODEL: str = "BAAI/bge-small-en"
 
 
 settings = Settings()

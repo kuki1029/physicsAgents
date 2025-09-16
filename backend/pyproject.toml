@@ -11,4 +11,9 @@ dependencies = [
     "langgraph>=0.2.70",
     "pydantic-settings>=2.7.1",
     "pydantic>=2.10.6",
+    "langchain-mongodb>=0.7.0",
+    "langchain-text-splitters>=0.3.9",
+    "langchain-huggingface>=0.3.1",
+    "langchain-community>=0.3.29",
+    "transformers>=4.56.1",
 ]

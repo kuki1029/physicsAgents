@@ -1,6 +1,7 @@
 from physicsAgents.application.rag.retrievers import Retriever, get_retriever
 from physicsAgents.application.rag.splitters import Splitter, get_splitter
 from physicsAgents.settings import settings
+from physicsAgents.domain.physicist import PhysicistExtract
 
 from langchain_core.documents import Document
 
@@ -26,5 +27,6 @@ class LongTermMemoryCreator:
 
         return cls(retriever, splitter)
 
-    def __call__(self, query: str) -> list[Document]:
-        return self.retriever.invoke(query)
+    def __call__(self, physicist: list[PhysicistExtract]) -> None:
+        if len(physicist) == 0:
+            return

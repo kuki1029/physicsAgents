@@ -1,4 +1,3 @@
-from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_mongodb import MongoDBAtlasVectorSearch
 from langchain_mongodb.retrievers import (
     MongoDBAtlasHybridSearchRetriever,
@@ -24,7 +23,6 @@ def get_retriever(
     """
     embedding_model = get_hf_embedding_model(embedding_model_id, device)
 
-    # TODO: Setup mongoDB
     vector_store = MongoDBAtlasVectorSearch.from_connection_string(
         connection_string=settings.MONGO_URI,
         embedding=embedding_model,
