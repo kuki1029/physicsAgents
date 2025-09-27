@@ -3,6 +3,7 @@ from physicsAgents.application.rag.splitters import Splitter, get_splitter
 from physicsAgents.settings import settings
 from physicsAgents.domain.physicist import PhysicistExtract
 from physicsAgents.infrastructure.mongo import MongoIndex, MongoClientWrapper
+from physicsAgents.application.data import get_extraction_gen
 
 from langchain_core.documents import Document
 
@@ -28,9 +29,15 @@ class LongTermMemoryCreator:
 
         return cls(retriever, splitter)
 
-    def __call__(self, physicist: list[PhysicistExtract]) -> None:
+    def __call__(self, physicists: list[PhysicistExtract]) -> None:
         if len(physicist) == 0:
             return
 
         with MongoClientWrapper(model=Document) as client:
             client.clear_collection()
+
+        extraction_generator = get_extraction_gen(physicists)
+
+        for _, docs in extraction_generator:
+            chunked_docs = self.splitter.split_documents(docs)
+            chunked_docs = deduplicate_do

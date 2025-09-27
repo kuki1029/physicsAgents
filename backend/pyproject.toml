@@ -16,4 +16,5 @@ dependencies = [
     "langchain-huggingface>=0.3.1",
     "langchain-community>=0.3.29",
     "transformers>=4.56.1",
+    "datasketch>=1.6.5",
 ]

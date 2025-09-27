@@ -14,7 +14,7 @@ def get_extraction_gen(
     """
     physicist_factory = PhysicistFactory()
     for physicist_extract in physicists:
-        physicist = physicist_factory.get_philosopher(physicist_extract.id)
+        physicist = physicist_factory.get_physicist(physicist_extract.id)
 
         # Only wikipedia supported for now
         physicist_docs = extract_from_wiki(physicist)
