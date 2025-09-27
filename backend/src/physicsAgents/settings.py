@@ -26,6 +26,7 @@ class Settings(BaseSettings):
 
     # For RAG. Using this model to avoid needing sentence-transformers as on metered conn
     RAG_EMBEDDING_MODEL: str = "BAAI/bge-small-en"
+    RAG_TEXT_EMBEDDING_MODEL_DIM: int = 384
 
 
 settings = Settings()

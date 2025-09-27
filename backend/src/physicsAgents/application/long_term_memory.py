@@ -3,7 +3,7 @@ from physicsAgents.application.rag.splitters import Splitter, get_splitter
 from physicsAgents.settings import settings
 from physicsAgents.domain.physicist import PhysicistExtract
 from physicsAgents.infrastructure.mongo import MongoIndex, MongoClientWrapper
-from physicsAgents.application.data import get_extraction_gen
+from physicsAgents.application.data import get_extraction_gen, deduplicate_docs
 
 from langchain_core.documents import Document
 
@@ -30,7 +30,7 @@ class LongTermMemoryCreator:
         return cls(retriever, splitter)
 
     def __call__(self, physicists: list[PhysicistExtract]) -> None:
-        if len(physicist) == 0:
+        if len(physicists) == 0:
             return
 
         with MongoClientWrapper(model=Document) as client:
@@ -40,4 +40,30 @@ class LongTermMemoryCreator:
 
         for _, docs in extraction_generator:
             chunked_docs = self.splitter.split_documents(docs)
-            chunked_docs = deduplicate_do
+            chunked_docs = deduplicate_docs(chunked_docs)
+
+            self.retriever.vectorstore.add_documents(chunked_docs)
+
+        self.__create_index()
+
+    def __create_index(self) -> None:
+        with MongoClientWrapper(model=Document) as client:
+            self.index = MongoIndex(retriever=self.retriever, mongo_client=client)
+            self.index.create(
+                embedding_dim=settings.RAG_EMBEDDING_MODEL,
+                is_hybrid=True,
+            )
+
+
+class LongTermMemoryRetriever:
+    def __init__(self, retriever: Retriever) -> None:
+        self.retriever = retriever
+
+    @classmethod
+    def build_from_settings(cls) -> "LongTermMemoryRetriever":
+        retriever = get_retriever(embedding_model_id=settings.RAG_EMBEDDING_MODEL)
+
+        return cls(retriever)
+
+    def __call__(self, query: str) -> list[Document]:
+        return self.retriever.invoke(query)
