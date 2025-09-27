@@ -2,6 +2,7 @@ from physicsAgents.application.rag.retrievers import Retriever, get_retriever
 from physicsAgents.application.rag.splitters import Splitter, get_splitter
 from physicsAgents.settings import settings
 from physicsAgents.domain.physicist import PhysicistExtract
+from physicsAgents.infrastructure.mongo import MongoIndex, MongoClientWrapper
 
 from langchain_core.documents import Document
 
@@ -30,3 +31,6 @@ class LongTermMemoryCreator:
     def __call__(self, physicist: list[PhysicistExtract]) -> None:
         if len(physicist) == 0:
             return
+
+        with MongoClientWrapper(model=Document) as client:
+            client.clear_collection()
