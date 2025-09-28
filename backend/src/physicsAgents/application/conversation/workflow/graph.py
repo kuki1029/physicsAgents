@@ -9,9 +9,10 @@ from physicsAgents.application.conversation.workflow.nodes import (
 )
 from physicsAgents.application.conversation.workflow.edges import should_summarize
 from physicsAgents.application.conversation.workflow.state import PhysicistState
+from functools import lru_cache
 
 
-# TODO: cache?
+@lru_cache(maxsize=1)
 def initiate_workflow():
     """
     Initiates the workflow for the physics agents conversation.

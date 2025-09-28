@@ -54,7 +54,6 @@ async def summarize_conversation_node(state: PhysicistState):
 
 async def summarize_context_node(state: PhysicistState):
     summary_chain = get_context_summary_chain()
-    print("I DID IT")
     res = await summary_chain.ainvoke({"context": state["messages"][-1].content})
     state["messages"][-1].content = res.content
 
