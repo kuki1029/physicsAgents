@@ -8,7 +8,7 @@ A full stack application that allows you to talk to iconic physicists.
 
 ---
 
-## ✨ Features
+## Features
 
 - Chat with AI-powered personas of famous physicists (Einstein, Newton, Curie, and more).
 - Retrieval-Augmented Generation for accurate, knowledge-backed answers.
@@ -18,7 +18,7 @@ A full stack application that allows you to talk to iconic physicists.
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Setup Instructions
 
